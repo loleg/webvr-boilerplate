@@ -99,7 +99,6 @@ WebVRConfig = {
 <script src="lib/d3-threeD.js"></script>
 <script src="lib/fit-projection.js"></script>
 <script src="lib/features.js"></script>
-<script src="data/oasi_5year.json"></script>
 
 <script>
 // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
@@ -206,60 +205,62 @@ function onTextureLoaded(texture) {
 
 var groupMap, groupBoxes = [];
 
-var dataPos = 0;
-var dataLen = data.traffic.Camignolo.locations[0].data.length;
+var dataPos = 0, dataLen = 0;
 
+$.getJSON('data/oasi_5year.json', function(oasidata) {
 $.getJSON('data/swiss-cantons-ticino.json', function(geodata) {
+loader.load('img/kgrs1000_ticino.jpg', function(texture) {
 
-  loader.load('img/kgrs1000_ticino.jpg', function(texture) {
-    texture.offset.x = 0.5;
-    texture.offset.y = 0.5;
+  var dataLen = oasidata.traffic.Camignolo.locations[0].data.length;
 
-    var material = new THREE.MeshBasicMaterial({
-      map: texture,
-      color: 0xffffff,
-      opacity: 0.3,
-      transparent: true,
-      shading: THREE.FlatShading,
-      overdraw: true,
-      side: THREE.BackSide
-    });
+  texture.offset.x = 0.5;
+  texture.offset.y = 0.5;
 
-    projectorGeom = fitProjection(d3.geo.mercator(), geodata, [[0.5,0.5],[-0.5,-0.5]], true);
-    groupMap = renderFeatures(projectorGeom, geodata.features, scene, material, false);
+  var material = new THREE.MeshBasicMaterial({
+    map: texture,
+    color: 0xffffff,
+    opacity: 0.3,
+    transparent: true,
+    shading: THREE.FlatShading,
+    overdraw: true,
+    side: THREE.BackSide
+  });
 
-    groupMap[0].rotation.x = Math.PI/2;
-    groupMap[0].position.set(0, 0, 0);
-    var upupup = 24;
-    groupMap[0].scale.set(upupup, upupup, upupup/2);
+  projectorGeom = fitProjection(d3.geo.mercator(), geodata, [[0.5,0.5],[-0.5,-0.5]], true);
+  groupMap = renderFeatures(projectorGeom, geodata.features, scene, material, false);
 
-    var geometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
+  groupMap[0].rotation.x = Math.PI/2;
+  groupMap[0].position.set(0, 0, 0);
+  var upupup = 24;
+  groupMap[0].scale.set(upupup, upupup, upupup/2);
 
-    function shuffleGameObject(object, i) {
-				object.Speed = Math.floor(Math.random()*7) + 1;
-        object.Speed *= (Math.random()*2 >= 1) ? -1 : 1;
-				object.Orientation = (Math.random()*2 >= 1);
-				object.material.color.setHex( Math.random() * 0xffffff );
-				object.position.z = -10 + Math.floor(Math.random()*20);
-        object.position.x = -10 +i*0.2;
-      }
+  var geometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
 
-    for ( var i = 0; i < 200; i ++ ) {
-
-      var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( {
-        color: Math.random() * 0xffffff,
-        transparent: true,
-        opacity: 1
-      } ) );
-
-      shuffleGameObject(object, i);
-      groupBoxes.push(object);
-
-      scene.add( object );
+  function shuffleGameObject(object, i) {
+			object.Speed = Math.floor(Math.random()*7) + 1;
+      object.Speed *= (Math.random()*2 >= 1) ? -1 : 1;
+			object.Orientation = (Math.random()*2 >= 1);
+			object.material.color.setHex( Math.random() * 0xffffff );
+			object.position.z = -10 + Math.floor(Math.random()*20);
+      object.position.x = -10 +i*0.2;
     }
 
+  for ( var i = 0; i < 200; i ++ ) {
 
-  });
+    var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( {
+      color: Math.random() * 0xffffff,
+      transparent: true,
+      opacity: 1
+    } ) );
+
+    shuffleGameObject(object, i);
+    groupBoxes.push(object);
+
+    scene.add( object );
+  }
+
+});
+});
 });
 
 function onDocumentMouseWheel( event ) {
