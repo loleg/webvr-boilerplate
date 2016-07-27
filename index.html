@@ -18,10 +18,18 @@ body {
   padding: 0;
   overflow: hidden;
 }
+#clock {
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  font: 12pt Arial,sans-serif;
+}
 </style>
 </head>
 
 <body>
+
+<div id="clock"></div>
 
 </body>
 
@@ -94,7 +102,6 @@ WebVRConfig = {
   -->
 <script src="build/webvr-manager.js"></script>
 
-<script src="lib/zepto.min.js"></script>
 <script src="lib/d3.v3.min.js"></script>
 <script src="lib/d3-threeD.js"></script>
 <script src="lib/fit-projection.js"></script>
@@ -206,12 +213,31 @@ function onTextureLoaded(texture) {
 var groupMap, groupBoxes = [];
 
 var dataPos = 0, dataLen = 0;
+var oasidata, geodata;
 
-$.getJSON('data/oasi_5year.json', function(oasidata) {
-$.getJSON('data/swiss-cantons-ticino.json', function(geodata) {
+d3.json("data/oasi_5year.json", function (error, oasi_5year) {
+d3.json("data/swiss-cantons-ticino.json", function (error, map_ticino) {
 loader.load('img/kgrs1000_ticino.jpg', function(texture) {
 
-  var dataLen = oasidata.traffic.Camignolo.locations[0].data.length;
+  geodata = map_ticino;
+
+  oasidata = { traffic: [], temp: [], noise: [] };
+  oasi_5year.traffic.Camignolo.locations[0].data.forEach(function(l) {
+    oasidata.traffic.push({
+      date: new Date(l.date), val: l.values[0].value
+    });
+  });
+  oasi_5year.temperature.Lugano.locations[0].data.forEach(function(l) {
+    oasidata.temp.push({
+      date: new Date(l.date), val: l.values[0].value
+    });
+  });
+  oasi_5year.noise_min["Camignolo Nord"].locations[0].data.forEach(function(l) {
+    oasidata.noise.push({
+      date: new Date(l.date), val: l.values[0].value
+    });
+  });
+  dataLen = oasidata.traffic.length;
 
   texture.offset.x = 0.5;
   texture.offset.y = 0.5;
@@ -268,6 +294,8 @@ function onDocumentMouseWheel( event ) {
     dataPos += (event.wheelDeltaY > 0) ? 1 : -1;
     if (dataPos < 0) dataPos = 0;
     if (dataPos > dataLen) dataPos = dataLen;
+
+    // var dt = oasidata.traffic.Camignolo.locations[0].data.length;
 
 }
 window.addEventListener('mousewheel', onDocumentMouseWheel, false);
