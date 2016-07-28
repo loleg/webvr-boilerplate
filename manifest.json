@@ -1,0 +1,13 @@
+{
+  "name": "AD(VR)16",
+  "icons": [
+    {
+      "src": "img/adv16-icon.jpg",
+      "sizes": "245x245",
+      "type": "image/jpg",
+      "density": 1
+    }
+  ],
+  "start_url": "index.html",
+  "display": "standalone"
+}
