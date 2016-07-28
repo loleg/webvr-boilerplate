@@ -226,22 +226,22 @@ d3.json("data/oasi_5year.json", function (error, oasi_5year) {
   }
   // console.log(datastream);
 
-  new THREE.TextureLoader().load('img/reusage-blog-stone-or-rock-texture-granite-that-looks-like-the-universe.png', function(texture) {
+  new THREE.TextureLoader().load('img/reusage-blog-stone-or-rock-texture-granite-that-looks-like-the-universe.jpg', function(texture) {
 
-    var geometry = new THREE.SphereGeometry(0.5, 32, 32);
+    var geometry = new THREE.SphereGeometry(0.5, 64, 64);
     var material = new THREE.MeshBasicMaterial({
       map: texture
     });
     sphere = new THREE.Mesh(geometry, material);
 
-    var geometry0 = new THREE.SphereGeometry(0.5, 32, 32);
-    sphere0 = new THREE.Mesh(geometry0, new THREE.MeshBasicMaterial({
+    sphere0 = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
         color: 0x000000
       }));
 
     // Position mesh to be right in front of you.
     sphere.position.set(0, controls.userHeight-0.4, -0.7);
     sphere0.position.set(0, controls.userHeight-0.4, -0.7);
+    sphere0.scale.set(0.9,0.9,0.9);
 
     var linematerial = new THREE.LineBasicMaterial({
     	color: 0xffffff, linewidth: 0.2
@@ -252,16 +252,19 @@ d3.json("data/oasi_5year.json", function (error, oasi_5year) {
     // Mess with the vertices
     var i = 0;
     sphere.geometry.vertices.forEach(function(v) {
-      v.x *= 1 + datastream[i] / 5;
-      v.y *= 1 + datastream[i] / 5;
-      v.z *= 1 + datastream[i] / 5;
-      var vx = v.x * 1.001;
-      var vy = v.y * 1.001;
-      var vz = v.z * 1.001;
+      // if (datastream[i] <= 0) datastream[i] = 0;
+      // if (i > 0) datastream[i] = (
+      //     ((datastream[i-1] + datastream[i]) / 2) +
+      //     ((datastream[i+1] + datastream[i]) / 2)
+      //   )/2;
+      v.x *= 1 + datastream[i] / 10;
+      v.y *= 1 + datastream[i] / 10;
+      v.z *= 1 + datastream[i] / 10;
       linegeometry.vertices.push(
-      	new THREE.Vector3( vx, vy, vz )
+      	new THREE.Vector3( v.x, v.y, v.z )
       );
       i++;
+      if (i > datastream.length-1) i = 0;
     });
 
     liners = new THREE.Line(linegeometry, linematerial);
