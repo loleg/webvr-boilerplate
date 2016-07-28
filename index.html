@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<title>Ticino Data Experience</title>
+<title>Web VR boilerplate</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -12,33 +12,16 @@
 body {
   width: 100%;
   height: 100%;
-  background: #fff;
-  color: #999;
+  background-color: #000;
+  color: #fff;
   margin: 0px;
   padding: 0;
   overflow: hidden;
-}
-#clock {
-  position: absolute;
-  bottom: 1em;
-  left: 1em;
-  font: 12pt Arial,sans-serif;
-}
-#container {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Chrome/Safari/Opera */
-  -khtml-user-select: none; /* Konqueror */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE/Edge */
-  user-select: none;
 }
 </style>
 </head>
 
 <body>
-
-<div id="clock"></div>
-<div id="container"></div>
 
 </body>
 
@@ -82,49 +65,37 @@ WebVRConfig = {
 <!--
   A polyfill for Promises. Needed for IE and Edge.
   -->
-<script src="build/es6-promise/dist/es6-promise.js"></script>
+<script src="node_modules/es6-promise/dist/es6-promise.js"></script>
 
 <!--
   three.js 3d library
   -->
-<script src="build/three/three.js"></script>
+<script src="node_modules/three/three.js"></script>
 
 <!--
   VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
    -->
-<script src="build/three/examples/js/controls/VRControls.js"></script>
+<script src="node_modules/three/examples/js/controls/VRControls.js"></script>
 
 <!--
   VREffect.js handles stereo camera setup and rendering.
   -->
-<script src="build/three/examples/js/effects/VREffect.js"></script>
-
-<script src="build/three/examples/js/loaders/OBJLoader.js"></script>
+<script src="node_modules/three/examples/js/effects/VREffect.js"></script>
 
 <!--
   A polyfill for WebVR using the Device{Motion,Orientation}Event API.
   -->
-<script src="build/webvr-polyfill/build/webvr-polyfill.js"></script>
+<script src="node_modules/webvr-polyfill/build/webvr-polyfill.js"></script>
 
 <!--
   Helps enter and exit VR mode, provides best practices while in VR.
   -->
 <script src="build/webvr-manager.js"></script>
 
-<script src="lib/d3.v3.min.js"></script>
-<script src="lib/d3-threeD.js"></script>
-<script src="lib/fit-projection.js"></script>
-<script src="lib/features.js"></script>
-
-<!--
-
-<script src="lib/nvd3/nv.d3.js"></script>
-<link href="lib/nvd3/nv.d3.css" rel="stylesheet" type="text/css"> -->
-
-<script src="lib/tween.js"></script>
-<script src="lib/CSS3DRenderer.js"></script>
 
 <script>
+var container = document.createElement( 'div' );
+document.body.appendChild( container );
 
 // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
 // Only enable it if you actually need to.
@@ -132,7 +103,7 @@ var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio(window.devicePixelRatio);
 
 // Append the canvas element created by the renderer to document body element.
-document.body.appendChild(renderer.domElement);
+container.appendChild( renderer.domElement );
 
 // Create a three.js scene.
 var scene = new THREE.Scene();
@@ -152,20 +123,24 @@ effect.setSize(window.innerWidth, window.innerHeight);
 // Add a repeating grid as a skybox.
 var boxSize = 5;
 var loader = new THREE.TextureLoader();
-loader.load('img/bg-2.png', onTextureLoaded);
+loader.load('img/box.png', onTextureLoaded);
 
 function onTextureLoaded(texture) {
-  var material = new THREE.MeshBasicMaterial({
-    side: THREE.BackSide,
-    depthWrite: false,
-    depthTest: false,
-    fog: false,
-    map: texture
-  });
-  var geometry = new THREE.SphereGeometry(10000, 64, 32);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(boxSize, boxSize);
 
-  sky = new THREE.Mesh(geometry, material);
-  scene.add(sky);
+  var geometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+  var material = new THREE.MeshBasicMaterial({
+    map: texture,
+    color: 0x0000ff,
+    side: THREE.BackSide
+  });
+
+  // Align the skybox to the floor (which is at y=0).
+  skybox = new THREE.Mesh(geometry, material);
+  skybox.position.y = boxSize/2;
+  scene.add(skybox);
 
   // For high end VR devices like Vive and Oculus, take into account the stage
   // parameters provided.
@@ -180,98 +155,97 @@ var params = {
 };
 var manager = new WebVRManager(renderer, effect, params);
 
-scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
-
-var light = new THREE.DirectionalLight( 0xffffff );
-light.position.set( 1, 1, 1 ).normalize();
-scene.add( light );
-
 // Create 3D objects.
-var sphere, sphere0, liners;
-var dataLen = null;
+var cube;
+var loader = new THREE.TextureLoader();
+loader.load('img/adv16.png', function(texture) {
+  var material = new THREE.MeshBasicMaterial({
+    map: texture
+  });
+  var geometry = new THREE.BoxGeometry(0.35, 0.56, 0.01);
+  cube = new THREE.Mesh(geometry, material);
+  cube.scale.set(1.5,1.5,1.5);
+  cube.position.set(0, controls.userHeight, -1);
 
-d3.json("data/oasi_5year.json", function (error, oasi_5year) {
+  cube.url = 'http://www.maind.supsi.ch/workshops/datavisualization-2016/';
 
-  oasidata = {};
-  datastream = [];
-  for (var dtype in oasi_5year) {
-    oasidata[dtype] = { locs: [] };
-    for (var key in oasi_5year[dtype]) {
-      var record = {
-        'recs': [],
-        'name': key,
-        'symb': oasi_5year[dtype][key].resolution,
-        'max': 0, 'min': 999999999
-      };
-      dd = oasi_5year[dtype][key].locations[0].data;
-      for (var i = 0; i < dd.length; i++) {
-        var ddr = dd[i];
-        var val = ddr.values[0].value;
-        if (isNaN(val)) continue;
-        record.recs.push({
-          'year': ddr.date.split('-')[0] +
-                  ddr.date.split('-')[1],
-          'val': val
-        });
-        if (val > record.max) record.max = val;
-        if (val < record.min) record.min = val;
-      }
-      if (dataLen === null) dataLen = dd.length;
-      if (dataLen !== dd.length) console.warn('Mismatched data');
-      oasidata[dtype].locs.push(record);
-      record.recs.forEach(function(r) {
-        datastream.push((r.val - record.min)/(record.max - record.min));
-      });
-    }
+  // Add cube mesh to your three.js scene
+  scene.add(cube);
+});
+
+(function() {
+  var positions = [
+    [1, 1], [1, -1], [-1, 1], [-1, -1]
+  ], rotations = [
+    1, -1, -1, 1
+  ], up = 2.2, urls = [
+    'aboutone',
+    'abouttwo',
+    'aboutthree',
+    'aboutfour'
+  ];
+  for (var i = 0; i < 4; i++) {
+    var plane2d = new THREE.PlaneGeometry(0.43, 0.39);
+    var material2d = new THREE.MeshBasicMaterial({
+      map: new THREE.TextureLoader().load('img/team' + (i+1) + '.png'),
+      transparent: true,
+      color: 0xffffff,
+      side: THREE.DoubleSide
+    });
+    var cc = new THREE.Mesh( plane2d, material2d );
+    cc.scale.set(up, up, up);
+    cc.position.set(positions[i][0], controls.userHeight, positions[i][1]);
+    cc.rotation.y = rotations[i] * Math.PI / 4;
+    cc.url = urls[i];
+    scene.add(cc);
+  //
+  //   var geometry = new THREE.PlaneGeometry( 5, 20, 32 );
+  // var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+  // var plane = new THREE.Mesh( geometry, material );
+  // scene.add( plane );
   }
-  // console.log(datastream);
 
-  new THREE.TextureLoader().load('img/reusage-blog-stone-or-rock-texture-granite-that-looks-like-the-universe.png', function(texture) {
-
-    var geometry = new THREE.SphereGeometry(0.5, 32, 32);
+  new THREE.TextureLoader().load('img/reusage-blog-stone-or-rock-texture-granite-that-looks-like-the-universe.jpg', function(texture) {
+    var geometry = new THREE.SphereGeometry(0.3, 5,5);
     var material = new THREE.MeshBasicMaterial({
       map: texture
     });
     sphere = new THREE.Mesh(geometry, material);
-
-    var geometry0 = new THREE.SphereGeometry(0.5, 32, 32);
-    sphere0 = new THREE.Mesh(geometry0, new THREE.MeshBasicMaterial({
-        color: 0x000000
-      }));
-
-    // Position mesh to be right in front of you.
-    sphere.position.set(0, controls.userHeight-0.4, -0.7);
-    sphere0.position.set(0, controls.userHeight-0.4, -0.7);
-
-    var linematerial = new THREE.LineBasicMaterial({
-    	color: 0xffffff, linewidth: 0.2
-    });
-
-    var linegeometry = new THREE.Geometry();
-
-    // Mess with the vertices
-    var i = 0;
-    sphere.geometry.vertices.forEach(function(v) {
-      v.x *= 1 + datastream[i] / 5;
-      v.y *= 1 + datastream[i] / 5;
-      v.z *= 1 + datastream[i] / 5;
-      var vx = v.x * 1.001;
-      var vy = v.y * 1.001;
-      var vz = v.z * 1.001;
-      linegeometry.vertices.push(
-      	new THREE.Vector3( vx, vy, vz )
-      );
-      i++;
-    });
-
-    liners = new THREE.Line(linegeometry, linematerial);
-    liners.scale.set(3,3,3);
-    scene.add(liners);
-
+    sphere.rotation.y = Math.PI / 2;
+    sphere.position.set(1, controls.userHeight, 0);
+    sphere.url = 'index.planet.html';
     scene.add(sphere);
-    scene.add(sphere0);
   });
-});
+})();
+
+(function() {
+
+  var plane2d = new THREE.PlaneGeometry(0.60, 0.44);
+  var material2d = new THREE.MeshBasicMaterial({
+    map: new THREE.TextureLoader().load('img/D3-js.jpg'),
+    color: 0xffffff
+  });
+  var cc = new THREE.Mesh( plane2d, material2d );
+  cc.position.set(-1, controls.userHeight, 0);
+  cc.rotation.y = Math.PI / 2;
+  cc.url = 'index.fog.html';
+  scene.add(cc);
+
+})();
+(function() {
+
+  var plane2d = new THREE.PlaneGeometry(0.83, 0.39);
+  var material2d = new THREE.MeshBasicMaterial({
+    map: new THREE.TextureLoader().load('img/sodacamp.png'),
+    color: 0xcccccc, transparent: true
+  });
+  var cc = new THREE.Mesh( plane2d, material2d );
+  cc.position.set(0, controls.userHeight, 1);
+  cc.rotation.y = -Math.PI;
+  cc.url = 'http://soda.camp';
+  scene.add(cc);
+
+})();
 
 // Kick off animation loop
 requestAnimationFrame(animate);
@@ -279,30 +253,32 @@ requestAnimationFrame(animate);
 window.addEventListener('resize', onResize, true);
 window.addEventListener('vrdisplaypresentchange', onResize, true);
 
+raycaster = new THREE.Raycaster();
+
+renderer.domElement.ondblclick = function(event) {
+  var mouse = new THREE.Vector2(), INTERSECTED;
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  raycaster.setFromCamera( mouse, camera );
+
+  raycaster.intersectObjects(scene.children).forEach(function(obj) {
+    if (typeof obj.object.url !== 'undefined')
+      document.location.href = obj.object.url;
+  });
+}
+
 // Request animation frame loop function
 var lastRender = 0;
-var targetRotation = 0;
 function animate(timestamp) {
   var delta = Math.min(timestamp - lastRender, 500);
   lastRender = timestamp;
 
-  targetRotation = camera.rotation.y*40;
-  if (typeof sphere !== 'undefined') {
-    sphere.rotation.y += (targetRotation - sphere.rotation.y) * 0.0005;
-    liners.rotation.y = sphere.rotation.y;
-    liners.position.y = 1;
-  }
+  // Apply rotation to cube mesh
+  if (typeof cube !== 'undefined')
+    cube.rotation.y += delta * 0.0001;
 
   // Update VR headset position and apply to camera.
   controls.update();
-  camera.rotation.z = 0;
-  camera.rotation.x = 0;
-  if (Math.abs(camera.rotation.y)>0.5)
-    camera.rotation.y = camera.rotation.y > 0 ? 0.5 : -0.5;
-  // if (Math.abs(camera.rotation.y)<0.1)
-  //   targetRotation = 0;
-  // if (Math.abs(targetRotation)>40)
-  //   targetRotation = targetRotation > 0 ? 40 : -40;
 
   // Render the scene through the manager.
   manager.render(scene, camera, timestamp);
@@ -344,10 +320,9 @@ function setStageDimensions(stage) {
   skybox.position.y = boxSize/2;
   scene.add(skybox);
 
-  // Place objects in the middle of the scene, at user height.
-  sphere.position.set(0, controls.userHeight, 0);
+  // Place the cube in the middle of the scene, at user height.
+  cube.position.set(0, controls.userHeight, 0);
 }
-
 
 </script>
 
