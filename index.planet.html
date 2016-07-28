@@ -276,6 +276,23 @@ d3.json("data/oasi_5year.json", function (error, oasi_5year) {
   });
 });
 
+var sound = null;
+function setupSound() {
+  var listener = new THREE.AudioListener();
+  camera.add(listener);
+
+  sound = new THREE.Audio(listener);
+  sound.load('snd/003_intonarumori2.ogg');
+  // sound.position.set(-30, 0, -750);
+  sound.setLoop(true);
+  // sound.setRefDistance(soundVol);
+  sound.autoplay = true;
+  sound.setVolume(0);
+  scene.add(sound);
+}
+
+setupSound();
+
 // Kick off animation loop
 requestAnimationFrame(animate);
 
@@ -294,6 +311,12 @@ function animate(timestamp) {
     sphere.rotation.y += (targetRotation - sphere.rotation.y) * 0.0005;
     liners.rotation.y = sphere.rotation.y;
     liners.position.y = 1;
+  }
+  if (sound)
+    sound.setVolume(Math.abs(targetRotation)/4);
+  if (Math.abs(targetRotation) < 2) {
+    targetRotation = 0;
+    sound.setVolume(0);
   }
 
   // Update VR headset position and apply to camera.
