@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<title>Ticino Data Experience</title>
+<title>AD(VR)16 - D3</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -32,10 +32,30 @@ body {
   -ms-user-select: none; /* IE/Edge */
   user-select: none;
 }
+
+
+#help {
+    position: absolute;
+    font: 32pt Sans-Serif;
+    font-style: italic;
+    opacity: 0.8;
+    bottom: 2%;
+    left: 2%;
+}
+#help.fadeout {
+    -webkit-transition: opacity 3s ease-in-out;
+    -moz-transition: opacity 3s ease-in-out;
+    -ms-transition: opacity 3s ease-in-out;
+    -o-transition: opacity 3s ease-in-out;
+     opacity: 0;
+}
 </style>
 </head>
 
 <body>
+
+<div id="help">d3-threejs demo by Steve Hall</div>
+<script>setTimeout(function() { document.getElementById('help').className = 'fadeout'; },5000);</script>
 
 <div id="clock"></div>
 <div id="container"></div>

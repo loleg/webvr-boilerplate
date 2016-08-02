@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<title>Web VR boilerplate</title>
+<title>AD(VR)16</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -19,11 +19,27 @@ body {
   padding: 0;
   overflow: hidden;
 }
+#help {
+    position: absolute;
+    font: 32pt Sans-Serif;
+    font-style: italic;
+    opacity: 0.8;
+    bottom: 2%;
+    left: 2%;
+}
+#help.fadeout {
+    -webkit-transition: opacity 3s ease-in-out;
+    -moz-transition: opacity 3s ease-in-out;
+    -ms-transition: opacity 3s ease-in-out;
+    -o-transition: opacity 3s ease-in-out;
+     opacity: 0;
+}
 </style>
 </head>
 
 <body>
-
+<div id="help">Double-tap on objects to enter</div>
+<script>setTimeout(function() { document.getElementById('help').className = 'fadeout'; },5000);</script>
 </body>
 
 <script>
@@ -175,6 +191,7 @@ loader.load('img/adv16.png', function(texture) {
 });
 
 (function() {
+	return;
   var positions = [
     [1, 1], [1, -1], [-1, 1], [-1, -1]
   ], rotations = [
@@ -205,7 +222,9 @@ loader.load('img/adv16.png', function(texture) {
   // var plane = new THREE.Mesh( geometry, material );
   // scene.add( plane );
   }
+})();
 
+(function() {
   new THREE.TextureLoader().load('img/reusage-blog-stone-or-rock-texture-granite-that-looks-like-the-universe.jpg', function(texture) {
     var geometry = new THREE.SphereGeometry(0.3, 5,5);
     var material = new THREE.MeshBasicMaterial({
