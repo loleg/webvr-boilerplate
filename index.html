@@ -184,14 +184,14 @@ loader.load('img/adv16.png', function(texture) {
   cube.scale.set(1.5,1.5,1.5);
   cube.position.set(0, controls.userHeight, -1);
 
-  cube.url = 'http://www.maind.supsi.ch/workshops/datavisualization-2016/';
+  cube.url = 'https://discourse.soda.camp/t/23-28-7-adventures-in-data-visualisation-supsi/78';
 
   // Add cube mesh to your three.js scene
   scene.add(cube);
 });
 
 (function() {
-	return;
+	return; // IGNORE
   var positions = [
     [1, 1], [1, -1], [-1, 1], [-1, -1]
   ], rotations = [
@@ -248,21 +248,21 @@ loader.load('img/adv16.png', function(texture) {
   var cc = new THREE.Mesh( plane2d, material2d );
   cc.position.set(-1, controls.userHeight, 0);
   cc.rotation.y = Math.PI / 2;
-  cc.url = 'index.fog.html';
+  cc.url = 'index.d3.html';
   scene.add(cc);
 
 })();
 (function() {
 
-  var plane2d = new THREE.PlaneGeometry(0.83, 0.39);
+  var plane2d = new THREE.PlaneGeometry(0.99, 0.8);
   var material2d = new THREE.MeshBasicMaterial({
-    map: new THREE.TextureLoader().load('img/sodacamp.png'),
+    map: new THREE.TextureLoader().load('img/kgrs1000_ticino.jpg'),
     color: 0xcccccc, transparent: true
   });
   var cc = new THREE.Mesh( plane2d, material2d );
   cc.position.set(0, controls.userHeight, 1);
   cc.rotation.y = -Math.PI;
-  cc.url = 'http://soda.camp';
+  cc.url = 'index.geo.html';
   scene.add(cc);
 
 })();
