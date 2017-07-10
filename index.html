@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<title>AD(VR)16</title>
+<title>ADV (VR) 17</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -38,7 +38,7 @@ body {
 </head>
 
 <body>
-<div id="help">Double-tap on objects to enter</div>
+<div id="help">Double-tap while looking to enter</div>
 <script>setTimeout(function() { document.getElementById('help').className = 'fadeout'; },5000);</script>
 </body>
 
@@ -175,7 +175,7 @@ var manager = new WebVRManager(renderer, effect, params);
 // Create 3D objects.
 var cube;
 var loader = new THREE.TextureLoader();
-loader.load('img/adv16.png', function(texture) {
+loader.load('img/adv17.gif', function(texture) {
   var material = new THREE.MeshBasicMaterial({
     map: texture
   });
@@ -184,7 +184,7 @@ loader.load('img/adv16.png', function(texture) {
   cube.scale.set(1.5,1.5,1.5);
   cube.position.set(0, controls.userHeight, -1);
 
-  cube.url = 'https://discourse.soda.camp/t/23-28-7-adventures-in-data-visualisation-supsi/78';
+  cube.url = 'index.adv17.html';
 
   // Add cube mesh to your three.js scene
   scene.add(cube);
@@ -260,9 +260,26 @@ loader.load('img/adv16.png', function(texture) {
     color: 0xcccccc, transparent: true
   });
   var cc = new THREE.Mesh( plane2d, material2d );
+  cc.position.set(0, 0.1, 0);
+  cc.rotation.x = -Math.PI / 2;
+  cc.scale.x = cc.scale.y = 4;
+  cc.url = 'index.geo.html';
+  scene.add(cc);
+
+})();
+
+
+(function() {
+
+  var plane2d = new THREE.PlaneGeometry(0.99, 0.8);
+  var material2d = new THREE.MeshBasicMaterial({
+    map: new THREE.TextureLoader().load('img/infopartment1.png'),
+    color: 0xcccccc, transparent: true
+  });
+  var cc = new THREE.Mesh( plane2d, material2d );
   cc.position.set(0, controls.userHeight, 1);
   cc.rotation.y = -Math.PI;
-  cc.url = 'index.geo.html';
+  cc.url = 'index.barchart.html';
   scene.add(cc);
 
 })();

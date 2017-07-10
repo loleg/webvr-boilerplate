@@ -55,7 +55,7 @@ body {
 <body>
 
 <div id="help">Cartography by Swisstopo</div>
-<script>setTimeout(function() { document.getElementById('help').className = 'fadeout'; },5000);</script>
+<!-- <script>setTimeout(function() { document.getElementById('help').className = 'fadeout'; },5000);</script> -->
 
 <div id="clock"></div>
 <div id="container"></div>
@@ -133,8 +133,6 @@ WebVRConfig = {
 
 <script src="lib/d3.v3.min.js"></script>
 <script src="lib/d3-threeD.js"></script>
-<script src="lib/fit-projection.js"></script>
-<script src="lib/features.js"></script>
 
 <!--
 
@@ -144,6 +142,8 @@ WebVRConfig = {
 <script src="lib/tween.js"></script>
 <script src="lib/CSS3DRenderer.js"></script>
 
-<script src="lib/drender.js"></script>
+<script src="geo/fit-projection.js"></script>
+<script src="geo/features.js"></script>
+<script src="geo/drender.js"></script>
 
 </html>

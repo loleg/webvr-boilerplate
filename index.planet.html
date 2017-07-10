@@ -132,8 +132,6 @@ WebVRConfig = {
 
 <script src="lib/d3.v3.min.js"></script>
 <script src="lib/d3-threeD.js"></script>
-<script src="lib/fit-projection.js"></script>
-<script src="lib/features.js"></script>
 
 <!--
 
@@ -331,8 +329,10 @@ function animate(timestamp) {
     liners.rotation.y = sphere.rotation.y;
     liners.position.y = 1;
   }
-  if (sound)
+  if (sound) {
     sound.setVolume(Math.abs(targetRotation)/4);
+    sound.setPlaybackRate(Math.abs(targetRotation)/20);
+  }
   if (Math.abs(targetRotation) < 2) {
     targetRotation = 0;
     sound.setVolume(0);
